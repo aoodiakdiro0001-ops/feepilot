@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FeePilot | Crypto & FX Fee Calculator — Spot, Futures, Transfers</title>
+<meta name="description" content="Interactive trading fee calculator: spot/futures commissions, gas, slippage, platform discounts. Compare Binance, KuCoin, Bybit and more.">
+<link rel="canonical" href="https://aoodiakdiro0001-ops.github.io/feepilot/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0e1a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="FeePilot | Trading Fee Calculator">
+<meta property="og:description" content="Commissions, gas, slippage and discounts — compare top exchanges.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Consolas,monospace}
+:root{--bg:#0a0e1a;--panel:#121830;--line:#26315a;--grn:#34d399;--gold:#fbbf24;--blu:#60a5fa;--pur:#c084fc;--txt:#dbe4f3;--mut:#8b98b8;--red:#f87171}
+body{background:var(--bg);color:var(--txt)}
+header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{font-size:22px;font-weight:900;color:var(--gold)}
+.logo small{display:block;font-size:11px;color:var(--mut);font-weight:400}
+.live{font-size:11px;font-weight:800;color:var(--grn);border:1px solid var(--grn);border-radius:12px;padding:3px 10px}
+header select{margin-left:auto;background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:14px;padding:7px 10px;font-size:13px}
+.tabs{display:flex;gap:6px;padding:14px 16px 0;flex-wrap:wrap;max-width:1100px;margin:0 auto}
+.tabs button{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-bottom:none;padding:10px 16px;border-radius:12px 12px 0 0;cursor:pointer;font-weight:800;font-size:13px}
+.tabs button.on{background:#1c2348;color:var(--gold)}
+main{max-width:1100px;margin:0 auto;padding:18px 15px 60px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:0 14px 14px 14px;padding:22px;display:none}
+.panel.on{display:block}
+.panel h2{color:var(--gold);margin-bottom:6px;font-size:19px}
+.panel p.sub{color:var(--mut);font-size:13px;margin-bottom:12px;line-height:1.7}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.box{background:#0a0e1a;border:1px solid var(--line);border-radius:14px;padding:16px}
+.box h3{font-size:14px;color:var(--blu);margin-bottom:10px}
+label.fl{display:block;font-size:12.5px;color:var(--mut);margin:8px 0 3px}
+input[type=text],input[type=number],select{background:#0a0e1a;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 13px;font-size:14px;outline:none;width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center}
+button.go{background:var(--gold);color:#231a03;border:none;padding:11px 26px;border-radius:10px;font-weight:900;cursor:pointer;font-size:14px}
+button.alt{background:transparent;color:var(--blu);border:1px solid var(--blu);padding:9px 16px;border-radius:10px;cursor:pointer;font-size:13px}
+.res{background:#0e2a1d;border:1px solid var(--grn);border-radius:12px;padding:14px;margin:10px 0;font-size:14px;line-height:2}
+.res b{color:var(--grn);font-size:18px}
+.res small{color:var(--mut)}
+.note{background:#1c2348;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--mut);margin:10px 0;line-height:1.7}
+table.bt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+table.bt th,table.bt td{border-bottom:1px solid var(--line);padding:9px 7px;text-align:left}
+table.bt th{color:var(--gold);font-size:12px}
+table.bt tr.win td{background:#0e2a1d}
+table.bt a{color:#06281c;background:var(--grn);font-weight:800;text-decoration:none;font-size:11.5px;padding:6px 12px;border-radius:12px;white-space:nowrap}
+.refbadge{font-size:10px;font-weight:900;background:var(--gold);color:#231a03;border-radius:8px;padding:2px 7px;margin-left:6px}
+.excard{display:flex;gap:10px;align-items:center;background:#0a0e1a;border:1px solid var(--line);border-radius:14px;padding:14px;margin:8px 0;flex-wrap:wrap}
+.excard .nm{font-weight:900;font-size:15px;min-width:110px}
+.excard .fees{font-size:12px;color:var(--mut);flex:1;min-width:170px}
+.excard a{background:var(--grn);color:#06281c;font-weight:900;text-decoration:none;font-size:13px;padding:10px 20px;border-radius:14px}
+.donate{background:linear-gradient(135deg,#1c2348,#0e2a1d);border:1px solid var(--grn);border-radius:16px;padding:20px;text-align:center;margin-top:8px;font-size:13px}
+.donate code{direction:ltr;display:block;font-family:monospace;font-size:12px;color:var(--grn);word-break:break-all;margin:4px auto;max-width:560px}
+.adslot{max-width:1100px;margin:12px auto 0;padding:0 15px;text-align:center}
+.adslot .ph{display:block;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:12px;padding:10px}
+footer{text-align:center;color:var(--mut);font-size:12.5px;padding:26px 16px;border-top:1px solid var(--line);line-height:2}
+footer a{color:var(--grn)}
+#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:12px 25px;border-radius:25px;z-index:200;display:none;font-size:14px;max-width:92vw;text-align:center}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">💸 FeePilot<small data-i="tag"></small></div>
+<span class="live">● LIVE</span>
+<select id="langSel" onchange="setLang(this.value)">
+<option value="en" selected>🇬🇧 English</option><option value="tr">🇹🇷 Türkçe</option><option value="ar">🇸🇦 العربية</option>
+</select>
+</header>
+<div class="tabs" id="tabs"></div>
+<main>
+<section class="panel on" id="p-spot">
+<h2 data-i="sT"></h2><p class="sub" data-i="sS"></p>
+<div class="grid2">
+<div class="box"><h3 data-i="inT"></h3>
+<label class="fl" data-i="fEx"></label><select id="sEx" onchange="fillFees('s')"></select>
+<label class="fl" data-i="fSide"></label><select id="sSide"><option value="buy" data-i="buyL"></option><option value="sell" data-i="sellL"></option></select>
+<label class="fl" data-i="fType"></label><select id="sMT"><option value="taker" data-i="takerL"></option><option value="maker" data-i="makerL"></option></select>
+<label class="fl" data-i="fQty"></label><input type="number" id="sQty" value="0.5" step="any">
+<label class="fl" data-i="fPrice"></label><input type="number" id="sPrice" value="83000" step="any">
+<label class="fl" data-i="fFee"></label><input type="number" id="sFee" value="0.1" step="any">
+<div class="row"><div style="flex:1"><label class="fl" data-i="fTok"></label><input type="number" id="sTok" value="0" step="any"></div><div style="flex:1"><label class="fl" data-i="fRef"></label><input type="number" id="sRef" value="0" step="any"></div></div>
+<div class="row"><button class="go" onclick="calcSpot()" data-i="btnCalc"></button></div>
+</div>
+<div class="box"><h3 data-i="outT"></h3><div id="spotRes" class="res">—</div><div class="note" data-i="feeNote"></div></div>
+</div>
+</section>
+<section class="panel" id="p-fut">
+<h2 data-i="fuT"></h2><p class="sub" data-i="fuS"></p>
+<div class="grid2">
+<div class="box"><h3 data-i="inT"></h3>
+<label class="fl" data-i="fEx"></label><select id="fEx" onchange="fillFees('f')"></select>
+<label class="fl" data-i="fNot"></label><input type="number" id="fNot" value="10000" step="any">
+<label class="fl" data-i="fLev"></label><input type="number" id="fLev" value="10" step="any">
+<label class="fl" data-i="fType"></label><select id="fMT"><option value="taker" data-i="takerL"></option><option value="maker" data-i="makerL"></option></select>
+<label class="fl" data-i="fFee"></label><input type="number" id="fFee" value="0.05" step="any">
+<label class="fl" data-i="fFund"></label><input type="number" id="fFund" value="0.01" step="any">
+<div class="row"><button class="go" onclick="calcFut()" data-i="btnCalc"></button></div>
+</div>
+<div class="box"><h3 data-i="outT"></h3><div id="futRes" class="res">—</div><div class="note" data-i="futNote"></div></div>
+</div>
+</section>
+<section class="panel" id="p-swap">
+<h2 data-i="swT"></h2><p class="sub" data-i="swS"></p>
+<div class="grid2">
+<div class="box"><h3 data-i="inT"></h3>
+<label class="fl" data-i="fAmt"></label><input type="number" id="wAmt" value="1000" step="any">
+<label class="fl" data-i="fNet"></label><input type="number" id="wNet" value="2.5" step="any">
+<label class="fl" data-i="fPlat"></label><input type="number" id="wPlat" value="0.1" step="any">
+<label class="fl" data-i="fSlip"></label><input type="number" id="wSlip" value="0.5" step="any">
+<div class="row"><button class="go" onclick="calcSwap()" data-i="btnCalc"></button></div>
+</div>
+<div class="box"><h3 data-i="outT"></h3><div id="swapRes" class="res">—</div><div class="note" data-i="slipNote"></div></div>
+</div>
+</section>
+<section class="panel" id="p-cmp">
+<h2 data-i="cT"></h2><p class="sub" data-i="cS"></p>
+<div class="row"><input type="number" id="cNot" value="10000" step="any" style="max-width:160px"><select id="cMT" style="max-width:150px"><option value="taker" data-i="takerL"></option><option value="maker" data-i="makerL"></option></select><button class="go" onclick="renderCmp()" data-i="btnCmp"></button></div>
+<div style="overflow-x:auto"><table class="bt"><thead><tr><th data-i="cEx"></th><th data-i="cFee"></th><th data-i="cCost"></th><th></th></tr></thead><tbody id="cmpBody"></tbody></table></div>
+<div class="note" data-i="cmpNote"></div>
+</section>
+<section class="panel" id="p-refs">
+<h2 data-i="rT"></h2><p class="sub" data-i="rS"></p>
+<div id="refList"></div>
+</section>
+<section class="panel" id="p-donate">
+<h2 data-i="doT"></h2><p class="sub" data-i="doS"></p>
+<div class="donate">
+<div>₿ BTC</div><div class="addr" id="btcA" style="font-family:monospace;font-size:12px;direction:ltr"></div>
+<div>₮ USDT-TRC20</div><div class="addr" id="usdtA" style="font-family:monospace;font-size:12px;direction:ltr"></div>
+<div class="row" style="justify-content:center"><button class="alt" onclick="copyTxt(document.getElementById('btcA').textContent)" data-i="btnCopy"></button></div>
+<div style="font-size:12.5px">🏦 Baran Avisat — TRY: <code dir="ltr">TR10 0001 0090 1008 4013 0050 01</code> <button class="alt" onclick="copyTxt('TR100001009010084013005001')" style="padding:4px 12px;font-size:12px" data-i="btnCopy"></button></div>
+<div style="font-size:12.5px">🏦 Baran Avisat — USD: <code dir="ltr">TR80 0001 0090 1008 4013 0050 02</code> <button class="alt" onclick="copyTxt('TR800001009010084013005002')" style="padding:4px 12px;font-size:12px" data-i="btnCopy"></button></div>
+</div>
+</section>
+</main>
+<div class="adslot" id="adFoot"><span class="ph" data-i="adHere" style="display:block;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:12px;padding:10px"></span></div>
+<footer><span data-i="foot"></span><br>📧 <a href="mailto:baranavisat@gmail.com">baranavisat@gmail.com</a> · 📞 <a href="tel:+905313263722" dir="ltr">+90 531 326 37 22</a> · <a href="https://wa.me/905313263722" target="_blank" rel="noopener">WhatsApp</a><br><a href="README.md" target="_blank">README</a> · MIT</footer>
+<div id="toast"></div>
+<script>
+const CONFIG={ads:{client:'',slot:'',carbonServe:'',carbonPlacement:''},
+pay:{btc:'bc1q8dhtdrndxsl70e97t8grydfe6pjue37zrhzf6c',usdt:'TLWdTjqqogkXNEXGiPWsGdjFP6ioycxeWW'},
+refs:{binance:'',kucoin:'',bybit:'',okx:'',mexc:'',bitget:''}};
+const EX=[
+{n:'Binance',u:'https://www.binance.com',sm:0.10,st:0.10,fm:0.02,ft:0.05},
+{n:'KuCoin',u:'https://www.kucoin.com',sm:0.10,st:0.10,fm:0.02,ft:0.06},
+{n:'Bybit',u:'https://www.bybit.com',sm:0.10,st:0.10,fm:0.02,ft:0.055},
+{n:'OKX',u:'https://www.okx.com',sm:0.08,st:0.10,fm:0.02,ft:0.05},
+{n:'MEXC',u:'https://www.mexc.com',sm:0.00,st:0.02,fm:0.00,ft:0.02},
+{n:'Bitget',u:'https://www.bitget.com',sm:0.10,st:0.10,fm:0.02,ft:0.06}];
+const T={
+en:{tag:'Spot, futures & transfer fee calculator',tabS:'📊 Spot',tabF:'⚡ Futures',tabW:'🔁 Transfer',tabC:'⚖️ Compare',tabR:'🎁 Referrals',tabDo:'💚 Donate',
+sT:'📊 Spot Fee Calculator',sS:'Maker/taker fee with token + referral discounts. Defaults are indicative VIP0 rates — overwrite with your exact fee.',
+inT:'Inputs',outT:'Result',fEx:'Exchange',fSide:'Side',buyL:'Buy',sellL:'Sell',fType:'Order',takerL:'Taker',makerL:'Maker',fQty:'Quantity',fPrice:'Price (USD)',fFee:'Fee %',fTok:'Token discount %',fRef:'Referral discount %',btnCalc:'Calculate',
+feeNote:'Indicative rates — always verify your tier on the exchange.',
+fuT:'⚡ Futures Cost Calculator',fuS:'Open + close fees on notional, margin from leverage, optional funding per period.',
+fNot:'Notional (USD)',fLev:'Leverage (x)',fFee:'Fee % (per side)',fFund:'Funding % (optional)',futNote:'Liquidation math not included — use exchange calculator for risk.',
+swT:'🔁 Transfer / Swap Cost',swS:'Network fee + platform fee + slippage tolerance → net received and effective cost.',
+fAmt:'Send amount (USD)',fNet:'Network (gas) fee (USD)',fPlat:'Platform fee %',fSlip:'Slippage tolerance %',slipNote:'Slippage >2% on majors or >5% on alts = high risk. Split large orders.',
+cT:'⚖️ Exchange Comparison',cS:'Same notional, one click — ranked by total cost with your referral discount applied.',
+btnCmp:'Compare',cEx:'Exchange',cFee:'Fee %',cCost:'Total cost',cmpNote:'Uses taker/maker + token/ref discounts from the Spot tab. Verify tiers on exchanges.',
+rT:'🎁 Trade With Lower Fees',rS:'Open accounts via referral links — you pay less, we earn a lifetime share of exchange commissions. Win-win.',
+doT:'💚 Support FeePilot',doS:'Free forever. Donations keep calculators accurate and ad-free tiers coming.',
+btnCopy:'Copy',adHere:'Your dev-tool ad here',foot:'FeePilot — free calculators. Not financial advice. Verify fees on exchanges.',
+copied:'Copied ✅',refOff:'Official site',refOn:'REF − you save extra'},
+tr:{tag:'Spot, vadeli ve transfer komisyon hesaplayıcı',tabS:'📊 Spot',tabF:'⚡ Vadeli',tabW:'🔁 Transfer',tabC:'⚖️ Karşılaştır',tabR:'🎁 Referans',tabDo:'💚 Destek',
+sT:'📊 Spot Komisyon Hesaplayıcı',sS:'Token + referans indirimli maker/taker. Varsayılanlar gösterge VIP0 oranlarıdır — kendi oranınızı yazın.',
+inT:'Girdiler',outT:'Sonuç',fEx:'Borsa',fSide:'Yön',buyL:'Alış',sellL:'Satış',fType:'Emir',takerL:'Taker',makerL:'Maker',fQty:'Miktar',fPrice:'Fiyat (USD)',fFee:'Komisyon %',fTok:'Token indirimi %',fRef:'Referans indirimi %',btnCalc:'Hesapla',
+feeNote:'Oranlar göstergedir — kademenizi borsada doğrulayın.',
+fuT:'⚡ Vadeli Maliyet Hesaplayıcı',fuS:'Açılış + kapanış komisyonu, kaldıraçtan teminat, opsiyonel fonlama.',
+fNot:'Pozisyon (USD)',fLev:'Kaldıraç (x)',fFee:'Komisyon % (taraf başına)',fFund:'Fonlama % (opsiyonel)',futNote:'Likidasyon matematiği dahil değildir.',
+swT:'🔁 Transfer / Swap Maliyeti',swS:'Ağ ücreti + platform + slippage toleransı → net alınan ve efektif maliyet.',
+fAmt:'Gönderilen (USD)',fNet:'Ağ (gas) ücreti (USD)',fPlat:'Platform %',fSlip:'Slippage toleransı %',slipNote:'Majörlerde %2, altlarda %5 üstü = yüksek risk. Büyük emirleri bölün.',
+cT:'⚖️ Borsa Karşılaştırma',cS:'Aynı tutar, tek tık — referans indiriminizle toplam maliyete göre sıralı.',
+btnCmp:'Karşılaştır',cEx:'Borsa',cFee:'Komisyon %',cCost:'Toplam maliyet',cmpNote:'Spot sekmesindeki indirimleri kullanır. Kademeleri borsada doğrulayın.',
+rT:'🎁 Daha Düşük Komisyonla İşlem Yapın',rS:'Referansla hesap açın — siz az ödeyin, biz ömür boyu komisyon payı alalım. Kazan-kazan.',
+doT:'💚 FeePilot\u2019u Destekle',doS:'Sonsuza dek ücretsiz. Bağışlar hesaplayıcıları güncel tutar.',
+btnCopy:'Kopyala',adHere:'Reklamınız burada',foot:'FeePilot — ücretsiz hesaplayıcılar. Yatırım tavsiyesi değildir.',
+copied:'Kopyalandı ✅',refOff:'Resmi site',refOn:'REF − ekstra indirim'},
+ar:{tag:'حاسبة عمولات التداول والتحويل',tabS:'📊 فوري',tabF:'⚡ آجل',tabW:'🔁 تحويل',tabC:'⚖️ قارن',tabR:'🎁 إحالة',tabDo:'💚 ادعم',
+sT:'📊 حاسبة العمولة الفورية',sS:'عمولة صانع/آخذ مع خصم العملة والإحالة. الافتراضيات استرشادية — اكتب نسبتك الدقيقة.',
+inT:'المدخلات',outT:'النتيجة',fEx:'المنصة',fSide:'الاتجاه',buyL:'شراء',sellL:'بيع',fType:'الأمر',takerL:'آخذ',makerL:'صانع',fQty:'الكمية',fPrice:'السعر (دولار)',fFee:'العمولة %',fTok:'خصم العملة %',fRef:'خصم الإحالة %',btnCalc:'احسب',
+feeNote:'النسب استرشادية — تحقق من فئتك في المنصة.',
+fuT:'⚡ حاسبة العقود الآجلة',fuS:'عمولة الفتح + الإغلاق على القيمة، والهامش من الرافعة، وتمويل اختياري.',
+fNot:'القيمة (دولار)',fLev:'الرافعة',fFee:'العمولة % (للجهة)',fFund:'التمويل % (اختياري)',futNote:'لا تشمل حساب التصفية.',
+swT:'🔁 تكلفة التحويل',swS:'رسوم الشبكة + المنصة + الانزلاق ← الصافي المستلم والتكلفة الفعلية.',
+fAmt:'المبلغ (دولار)',fNet:'رسوم الشبكة (دولار)',fPlat:'عمولة المنصة %',fSlip:'تحمل الانزلاق %',slipNote:'انزلاق فوق 2% للكبار أو 5% للصغار = خطر. قسّم الأوامر الكبيرة.',
+cT:'⚖️ مقارنة المنصات',cS:'نفس المبلغ بنقرة — مرتبة بالتكلفة مع خصم إحالتك.',
+btnCmp:'قارن',cEx:'المنصة',cFee:'العمولة %',cCost:'التكلفة',cmpNote:'يستخدم خصومات تبويب الفوري. تحقق من الفئات.',
+rT:'🎁 تداول بعمولة أقل',rS:'افتح حساباً برابط الإحالة — تدفع أقل ونحصل على حصة دائمة. ربح للطرفين.',
+doT:'💚 ادعم FeePilot',doS:'مجاني للأبد. التبرعات تُبقي الحاسبات دقيقة.',
+btnCopy:'نسخ',adHere:'مساحتك الإعلانية هنا',foot:'FeePilot — حاسبات مجانية. ليست نصيحة استثمارية.',
+copied:'تم ✅',refOff:'الموقع الرسمي',refOn:'REF − خصم إضافي'}};
+let lang='en';
+const t=k=>(T[lang]&&T[lang][k])||T.en[k]||k;
+function setLang(v){lang=v;document.documentElement.lang=v;document.documentElement.dir=(v==='ar')?'rtl':'ltr';document.getElementById('langSel').value=v;
+document.querySelectorAll('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i);});
+document.querySelectorAll('[data-i-ph]').forEach(e=>{e.placeholder=t(e.dataset.iPh);});
+buildTabs();fillAll();renderCmp();renderRefs();renderDonate();}
+const TABS=[['spot','tabS'],['fut','tabF'],['swap','tabW'],['cmp','tabC'],['refs','tabR'],['donate','tabDo']];
+function buildTabs(){document.getElementById('tabs').innerHTML=TABS.map(x=>`<button id="tab-${x[0]}" onclick="tab('${x[0]}')">${t(x[1])}</button>`).join('');document.getElementById('tab-spot').classList.add('on');}
+function tab(w){TABS.forEach(x=>{const b=document.getElementById('tab-'+x[0]);if(b)b.classList.toggle('on',w===x[0]);document.getElementById('p-'+x[0]).classList.toggle('on',w===x[0]);});}
+function toast(m){let d=document.getElementById('toast');d.textContent=m;d.style.display='block';clearTimeout(d._h);d._h=setTimeout(()=>d.style.display='none',2200);}
+function copyTxt(x){try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(x);}catch(e){}toast(t('copied'));}
+function num(id,d){const v=parseFloat((document.getElementById(id)||{}).value);return isNaN(v)?(d||0):v;}
+function effRate(base,tok,ref){return base*(1-tok/100)*(1-ref/100);}
+function fillFees(which){
+const ex=EX[document.getElementById(which==='s'?'sEx':'fEx').selectedIndex]||EX[0];
+const mt=(document.getElementById(which==='s'?'sMT':'fMT')||{}).value||'taker';
+const base=which==='s'?(mt==='maker'?ex.sm:ex.st):(mt==='maker'?ex.fm:ex.ft);
+document.getElementById(which==='s'?'sFee':'fFee').value=base;
+}
+function fillAll(){
+const opts=EX.map((e,i)=>`<option value="${i}">${e.n}</option>`).join('');
+document.getElementById('sEx').innerHTML=opts;document.getElementById('fEx').innerHTML=opts;
+fillFees('s');fillFees('f');
+}
+function calcSpot(){
+const ex=EX[document.getElementById('sEx').selectedIndex]||EX[0];
+const side=document.getElementById('sSide').value,mt=document.getElementById('sMT').value;
+const q=num('sQty'),p=num('sPrice');
+const base=num('sFee'),tok=num('sTok'),ref=num('sRef');
+const r=effRate(base,tok,ref),not=q*p,fee=not*r/100;
+const tot=side==='buy'?not+fee:not-fee;
+document.getElementById('spotRes').innerHTML=`${t('fEx')}: <b>${ex.n}</b> · ${mt}<br>${t('outT')}: <b>$${tot.toLocaleString('en-US',{maximumFractionDigits:2})}</b><br><small>fee ${r.toFixed(4)}% = $${fee.toFixed(2)} · notional $${not.toLocaleString('en-US',{maximumFractionDigits:2})}</small>`;
+return {not,fee,tot,r};
+}
+function calcFut(){
+const ex=EX[document.getElementById('fEx').selectedIndex]||EX[0];
+const not=num('fNot'),lev=Math.max(1,num('fLev',1));
+const base=num('fFee'),fund=num('fFund');
+const open=not*base/100,close=not*base/100,fundC=not*fund/100;
+const margin=not/lev,total=open+close+fundC;
+document.getElementById('futRes').innerHTML=`${t('fEx')}: <b>${ex.n}</b> · x${lev}<br>${t('outT')}: <b>$${total.toFixed(2)}</b><br><small>open $${open.toFixed(2)} + close $${close.toFixed(2)} + funding $${fundC.toFixed(2)} · margin $${margin.toFixed(2)}</small>`;
+return {total,margin};
+}
+function calcSwap(){
+const amt=num('wAmt'),net=num('wNet'),plat=num('wPlat'),slip=num('wSlip');
+const afterNet=Math.max(0,amt-net);
+const afterPlat=afterNet*(1-plat/100);
+const recv=afterPlat*(1-slip/100);
+const eff=amt>0?(1-recv/amt)*100:0;
+const warn=slip>5||(slip>2&&amt>5000);
+document.getElementById('swapRes').innerHTML=`${t('outT')}: <b>$${recv.toFixed(2)}</b><br><small>−$${net.toFixed(2)} net −${plat}% −${slip}% slip · eff. cost ${eff.toFixed(2)}%${warn?' · ⚠️':''}</small>`;
+return {recv,eff};
+}
+function refFor(n){return (CONFIG.refs&&CONFIG.refs[n.toLowerCase()])||EX.find(e=>e.n===n).u;}
+function isRef(n){return !!(CONFIG.refs&&CONFIG.refs[n.toLowerCase()]);}
+function renderCmp(){
+const not=num('cNot',10000),mt=(document.getElementById('cMT')||{}).value||'taker';
+const tok=num('sTok'),ref=num('sRef');
+const rows=EX.map(e=>{const base=mt==='maker'?e.sm:e.st;const r=effRate(base,tok,ref);return {n:e.n,r,cost:not*r/100};});
+rows.sort((a,b)=>a.cost-b.cost);
+document.getElementById('cmpBody').innerHTML=rows.map((x,i)=>`<tr${i===0?' class="win"':''}><td><b>${i===0?'🥇 ':''}${x.n}</b></td><td>${x.r.toFixed(3)}%</td><td>$${x.cost.toFixed(2)}</td><td><a target="_blank" rel="nofollow sponsored noopener" href="${refFor(x.n)}">${t('refOff')}${isRef(x.n)?' ★':''}</a></td></tr>`).join('');
+}
+function renderRefs(){
+document.getElementById('refList').innerHTML=EX.map(e=>{const has=isRef(e.n);
+return `<div class="excard"><span class="nm">${e.n}</span><span class="fees">spot ${e.sm}/${e.st}% · fut ${e.fm}/${e.ft}%${has?`<span class="refbadge">${t('refOn')}</span>`:''}</span><a target="_blank" rel="nofollow sponsored noopener" href="${refFor(e.n)}">${t('refOff')} →</a></div>`;}).join('');
+}
+function renderDonate(){
+document.getElementById('btcA').textContent=CONFIG.pay.btc;
+document.getElementById('usdtA').textContent=CONFIG.pay.usdt;
+}
+function loadAds(){const A=CONFIG.ads,el=document.getElementById('adFoot');if(!el)return;
+if(A.client){el.innerHTML='<ins class="adsbygoogle" style="display:block" data-ad-client="'+A.client+'" data-ad-slot="'+(A.slot||'')+'" data-ad-format="auto"></ins>';
+if(!document.querySelector('script[src*="adsbygoogle"]')){const s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+A.client;s.crossOrigin='anonymous';document.head.appendChild(s);}try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}}
+else if(A.carbonServe){el.innerHTML='';const s=document.createElement('script');s.async=true;s.id='_carbonads_js';s.src='//cdn.carbonads.com/carbon.js?serve='+A.carbonServe+'&placement='+A.carbonPlacement;el.appendChild(s);}}
+setLang('en');loadAds();renderDonate();
+</script>
+</body>
+</html>
