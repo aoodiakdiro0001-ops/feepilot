@@ -149,6 +149,7 @@ const EX=[
 {n:'OKX',u:'https://www.okx.com',sm:0.08,st:0.10,fm:0.02,ft:0.05},
 {n:'MEXC',u:'https://www.mexc.com',sm:0.00,st:0.02,fm:0.00,ft:0.02},
 {n:'Bitget',u:'https://www.bitget.com',sm:0.10,st:0.10,fm:0.02,ft:0.06}];
+const REF_EXTRA=[{n:'Pocket Option',u:'https://pocketoption.com',ref:'https://pocket-friends.co/r/hvb4v0f1tt'}];
 const T={
 en:{tag:'Spot, futures & transfer fee calculator',tabS:'📊 Spot',tabF:'⚡ Futures',tabW:'🔁 Transfer',tabC:'⚖️ Compare',tabR:'🎁 Referrals',tabDo:'💚 Donate',
 sT:'📊 Spot Fee Calculator',sS:'Maker/taker fee with token + referral discounts. Defaults are indicative VIP0 rates — overwrite with your exact fee.',
@@ -163,7 +164,7 @@ btnCmp:'Compare',cEx:'Exchange',cFee:'Fee %',cCost:'Total cost',cmpNote:'Uses ta
 rT:'🎁 Trade With Lower Fees',rS:'Open accounts via referral links — you pay less, we earn a lifetime share of exchange commissions. Win-win.',
 doT:'💚 Support FeePilot',doS:'Free forever. Donations keep calculators accurate and ad-free tiers coming.',
 btnCopy:'Copy',adHere:'Your dev-tool ad here',foot:'FeePilot — free calculators. Not financial advice. Verify fees on exchanges.',
-copied:'Copied ✅',refOff:'Official site',refOn:'REF − you save extra'},
+copied:'Copied ✅',refOff:'Official site',refOn:'REF − you save extra',riskL:'High-risk product'},
 tr:{tag:'Spot, vadeli ve transfer komisyon hesaplayıcı',tabS:'📊 Spot',tabF:'⚡ Vadeli',tabW:'🔁 Transfer',tabC:'⚖️ Karşılaştır',tabR:'🎁 Referans',tabDo:'💚 Destek',
 sT:'📊 Spot Komisyon Hesaplayıcı',sS:'Token + referans indirimli maker/taker. Varsayılanlar gösterge VIP0 oranlarıdır — kendi oranınızı yazın.',
 inT:'Girdiler',outT:'Sonuç',fEx:'Borsa',fSide:'Yön',buyL:'Alış',sellL:'Satış',fType:'Emir',takerL:'Taker',makerL:'Maker',fQty:'Miktar',fPrice:'Fiyat (USD)',fFee:'Komisyon %',fTok:'Token indirimi %',fRef:'Referans indirimi %',btnCalc:'Hesapla',
@@ -177,7 +178,7 @@ btnCmp:'Karşılaştır',cEx:'Borsa',cFee:'Komisyon %',cCost:'Toplam maliyet',cm
 rT:'🎁 Daha Düşük Komisyonla İşlem Yapın',rS:'Referansla hesap açın — siz az ödeyin, biz ömür boyu komisyon payı alalım. Kazan-kazan.',
 doT:'💚 FeePilot\u2019u Destekle',doS:'Sonsuza dek ücretsiz. Bağışlar hesaplayıcıları güncel tutar.',
 btnCopy:'Kopyala',adHere:'Reklamınız burada',foot:'FeePilot — ücretsiz hesaplayıcılar. Yatırım tavsiyesi değildir.',
-copied:'Kopyalandı ✅',refOff:'Resmi site',refOn:'REF − ekstra indirim'},
+copied:'Kopyalandı ✅',refOff:'Resmi site',refOn:'REF − ekstra indirim',riskL:'Yüksek riskli ürün'},
 ar:{tag:'حاسبة عمولات التداول والتحويل',tabS:'📊 فوري',tabF:'⚡ آجل',tabW:'🔁 تحويل',tabC:'⚖️ قارن',tabR:'🎁 إحالة',tabDo:'💚 ادعم',
 sT:'📊 حاسبة العمولة الفورية',sS:'عمولة صانع/آخذ مع خصم العملة والإحالة. الافتراضيات استرشادية — اكتب نسبتك الدقيقة.',
 inT:'المدخلات',outT:'النتيجة',fEx:'المنصة',fSide:'الاتجاه',buyL:'شراء',sellL:'بيع',fType:'الأمر',takerL:'آخذ',makerL:'صانع',fQty:'الكمية',fPrice:'السعر (دولار)',fFee:'العمولة %',fTok:'خصم العملة %',fRef:'خصم الإحالة %',btnCalc:'احسب',
@@ -191,7 +192,7 @@ btnCmp:'قارن',cEx:'المنصة',cFee:'العمولة %',cCost:'التكلف
 rT:'🎁 تداول بعمولة أقل',rS:'افتح حساباً برابط الإحالة — تدفع أقل ونحصل على حصة دائمة. ربح للطرفين.',
 doT:'💚 ادعم FeePilot',doS:'مجاني للأبد. التبرعات تُبقي الحاسبات دقيقة.',
 btnCopy:'نسخ',adHere:'مساحتك الإعلانية هنا',foot:'FeePilot — حاسبات مجانية. ليست نصيحة استثمارية.',
-copied:'تم ✅',refOff:'الموقع الرسمي',refOn:'REF − خصم إضافي'}};
+copied:'تم ✅',refOff:'الموقع الرسمي',refOn:'REF − خصم إضافي',riskL:'منتج عالي المخاطر'}};
 let lang='en';
 const t=k=>(T[lang]&&T[lang][k])||T.en[k]||k;
 function setLang(v){lang=v;document.documentElement.lang=v;document.documentElement.dir=(v==='ar')?'rtl':'ltr';document.getElementById('langSel').value=v;
@@ -255,8 +256,10 @@ rows.sort((a,b)=>a.cost-b.cost);
 document.getElementById('cmpBody').innerHTML=rows.map((x,i)=>`<tr${i===0?' class="win"':''}><td><b>${i===0?'🥇 ':''}${x.n}</b></td><td>${x.r.toFixed(3)}%</td><td>$${x.cost.toFixed(2)}</td><td><a target="_blank" rel="nofollow sponsored noopener" href="${refFor(x.n)}">${t('refOff')}${isRef(x.n)?' ★':''}</a></td></tr>`).join('');
 }
 function renderRefs(){
-document.getElementById('refList').innerHTML=EX.map(e=>{const has=isRef(e.n);
+let h=EX.map(e=>{const has=isRef(e.n);
 return `<div class="excard"><span class="nm">${e.n}</span><span class="fees">spot ${e.sm}/${e.st}% · fut ${e.fm}/${e.ft}%${has?`<span class="refbadge">${t('refOn')}</span>`:''}</span><a target="_blank" rel="nofollow sponsored noopener" href="${refFor(e.n)}">${t('refOff')} →</a></div>`;}).join('');
+h+=REF_EXTRA.map(e=>`<div class="excard"><span class="nm">${e.n}</span><span class="fees">⚠️ ${t('riskL')}<span class="refbadge">${t('refOn')}</span></span><a target="_blank" rel="nofollow sponsored noopener" href="${e.ref}">${t('refOff')} →</a></div>`).join('');
+document.getElementById('refList').innerHTML=h;
 }
 function renderDonate(){
 document.getElementById('btcA').textContent=CONFIG.pay.btc;
